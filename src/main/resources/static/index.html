@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Operations Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased h-screen overflow-hidden flex flex-col">
+
+    <!-- Top Navigation Header (Black top bar) -->
+    <header class="bg-slate-900 text-white shadow-md flex-shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-brand-600 rounded-lg">
+                    <i class="fa-solid me-1 fa-building-user text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Hostel Management System</h1>
+                </div>
+            </div>
+            <a href="/h2-console" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md font-medium border border-slate-700 transition flex items-center gap-2">
+                <i class="fa-solid fa-database"></i> H2 Console
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container Layout matching diagram -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0 w-full">
+
+        <!-- LEFT COLUMN: Full Height Form Panel (White Box in Diagram) -->
+        <div class="lg:col-span-4 bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col h-full overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 flex-shrink-0">
+                <h2 id="form-title" class="text-lg font-bold text-slate-900">Add New Resident</h2>
+                <span id="edit-badge" class="hidden px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">Edit Mode</span>
+            </div>
+
+            <form id="student-form" class="space-y-4 flex-1 flex flex-col justify-between">
+                <input type="hidden" id="student-id">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Full Name</label>
+                        <input type="text" id="name" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm transition" placeholder="e.g. John Doe">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Room Number</label>
+                        <input type="text" id="roomNumber" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm transition" placeholder="e.g. B-204">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Admission Date</label>
+                        <input type="date" id="admissionDate" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm transition">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Fees Paid (₹)</label>
+                            <input type="number" step="0.01" min="0" id="feesPaid" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm transition" placeholder="0.00">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Pending Fees (₹)</label>
+                            <input type="number" step="0.01" min="0" id="pendingFees" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-sm transition" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex items-center space-x-3 flex-shrink-0">
+                    <button type="submit" id="btn-submit" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Register Resident
+                    </button>
+                    <button type="button" id="btn-cancel" onclick="resetForm()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 px-4 rounded-lg transition text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT COLUMN: Stacked Widgets + Table -->
+        <div class="lg:col-span-8 flex flex-col min-h-0 h-full gap-5">
+            
+            <!-- TOP RIGHT: 3 Stat Cards Row (Green & Dark Boxes in Diagram) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-shrink-0">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Total Residents</p>
+                        <p id="stat-total" class="text-2xl font-bold text-slate-900 mt-1">0</p>
+                    </div>
+                    <div class="p-2.5 bg-blue-50 text-brand-600 rounded-lg">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Collected Fees</p>
+                        <p id="stat-collected" class="text-2xl font-bold text-emerald-600 mt-1">₹0.00</p>
+                    </div>
+                    <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg">
+                        <i class="fa-solid fa-circle-check text-xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">Pending Dues</p>
+                        <p id="stat-pending" class="text-2xl font-bold text-rose-600 mt-1">₹0.00</p>
+                    </div>
+                    <div class="p-2.5 bg-rose-50 text-rose-600 rounded-lg">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM RIGHT: Resident Directory Table (Orange Box in Diagram) -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-shrink-0">
+                    <h2 class="text-base font-bold text-slate-900">Resident Directory</h2>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="fetchStudents()" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate text-slate-500"></i> Refresh
+                        </button>
+                        <button onclick="filterPendingOnly()" class="px-3 py-1.5 text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-filter text-rose-500"></i> Pending Dues Only
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Internal Table Scroll Area -->
+                <div class="overflow-y-auto flex-1 min-h-0">
+                    <table class="w-full text-left text-sm relative">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs tracking-wider sticky top-0 z-10">
+                            <tr>
+                                <th class="py-3 px-4 font-semibold">ID</th>
+                                <th class="py-3 px-4 font-semibold">Name</th>
+                                <th class="py-3 px-4 font-semibold">Room</th>
+                                <th class="py-3 px-4 font-semibold">Admission Date</th>
+                                <th class="py-3 px-4 font-semibold text-right">Paid</th>
+                                <th class="py-3 px-4 font-semibold text-right">Pending</th>
+                                <th class="py-3 px-4 font-semibold text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-slate-400">Loading residents...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Link -->
+    <script src="app.js"></script>
+</body>
+</html>
