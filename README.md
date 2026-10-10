@@ -1,67 +1,118 @@
-# 🏨 Hostel Management System
+# Hostel Management System
 
-A robust, enterprise-grade full-stack web application designed to streamline hostel operations, automate room allocations, manage student records, and simplify fee tracking. Built using **Spring Boot**, this system ensures high performance, secure data isolation, and smooth system operations.
+A single-admin web dashboard for a hostel owner or warden. It handles resident registration, room allocation (max 4 per room), payment tracking, and automatic pending-fee calculation.
 
----
+## Features
 
-## 📂 System Documentation
-For deeper technical layouts and design details, please refer to the core architecture documents located in the `/docs` folder:
-* 🎨 [Frontend Architecture](./docs/frontend.md) — UI layouts, components, and client-side flow.
-* 🛡️ [Security Protocol](./docs/security.md) — Authentication patterns, data encryption, and environment guards.
-* ⚙️ [System Design](./docs/system.md) — Backend routing, database structure, and core APIs.
+- Register, edit and check out residents (check-out is a soft delete; history is kept)
+- Rooms are created automatically, capped at 4 active residents each, with a live room overview
+- Record payments (Cash / UPI / Card / Bank transfer) and view each resident's payment history
+- Pending fees are calculated on the server: standard monthly fee minus all payments
+- Change the standard monthly fee from the dashboard at any time
+- Search residents and filter by pending dues
+- Secure login (BCrypt, CSRF protection, session-based)
 
----
+## Tech Stack
 
-## 🛠️ Tech Stack
-* **Backend Framework:** Java Spring Boot
-* **Build Tool:** Maven
-* **Database:** MySQL / PostgreSQL (Configure in your local environment)
-* **Security:** Spring Security (Production-ready data isolation)
+Java 21, Spring Boot 3.4.3 (Web, Data JPA, Validation, Security), H2 file database, vanilla JavaScript, Tailwind CSS (CDN).
 
----
+## Prerequisites
 
-## 🚀 Getting Started
+- JDK 21
+- Git
 
-Follow these step-by-step instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+Maven is **not** required; the included wrapper (`mvnw`) downloads it.
 
-### 1. Prerequisites
-Ensure you have the following installed on your machine:
-* **Java Development Kit (JDK):** Version 17 or higher
-* **Apache Maven:** Version 3.8+ (Or use the embedded `mvnw` wrapper script)
-* **Database Engine:** MySQL Server (running locally or in the cloud)
-* **IDE:** Visual Studio Code (with Java Extension Pack installed)
+## Setup
 
-### 2. Environment Configuration
-Create a file named `.env` in the **root directory** of the project (the file is kept out of Git via `.gitignore`). Refer to `.env.example` for the required keys. 
+1. Clone the repository and open the project folder.
+2. Create a `.env` file next to `pom.xml` (copy `.env.example`):
 
-Populate your local environment configurations as follows:
-```properties
-DB_URL=jdbc:mysql://localhost:3306/hostel_db
-DB_USERNAME=your_database_username
-DB_PASSWORD=your_database_password
-JWT_SECRET=your_super_secret_jwt_signing_key_here
+```
+   HOSTEL_ADMIN_USERNAME=admin
+   HOSTEL_ADMIN_PASSWORD=choose-a-strong-password
+   HOSTEL_STANDARD_MONTHLY_FEE=5000.00
 ```
 
-### 3. Local Installation & Run
-Execute the following commands in your integrated terminal window to compile the project structure and spin up the local development web server:
+The fee value is only a first-run seed. After the first start, change it from the dashboard.
 
-```bash
-# Clone the repository to your workstation
-git clone https://github.com
+3. Run the app:
 
-# Navigate directly into the root folder directory
-cd hostel-management-system
+```
+   # Windows
+   mvnw.cmd spring-boot:run
 
-# Clean build artifacts and compile the Java application structures
-./mvnw clean compile
-
-# Launch the Spring Boot application server locally
-./mvnw spring-boot:run
+   # macOS / Linux
+   ./mvnw spring-boot:run
 ```
 
-Once execution finishes successfully, the backend server instance will boot up and begin listening for incoming network requests at: `http://localhost:8080`
+4. Open http://localhost:8080 and log in with the username and password from `.env`.
 
----
+## Usage
 
-## 📈 Database Migration Strategy
-The application project uses Hibernate DDL-Auto configuration layers to dynamically generate data structures. During your initial test phase runs, ensure `spring.jpa.hibernate.ddl-auto` is configured properly inside your system variables to systematically scaffold your relational table models without conflicts.
+| Task                    | How                                                        |
+| ----------------------- | ---------------------------------------------------------- |
+| Add a resident          | Fill the form on the left. An initial payment is optional. |
+| Record a later payment  | Click the rupee icon on the resident's row.                |
+| Edit or move a resident | Click the pencil icon (active residents only).             |
+| Check out a resident    | Click the exit icon and confirm. The bed is freed.         |
+| See room occupancy      | Sidebar, then Rooms.                                       |
+| Change the monthly fee  | Sidebar, then Monthly fee.                                 |
+
+Room numbers use the format `A-101` (one letter, a hyphen, then three digits).
+
+## Project Structure
+
+```
+src/main/java/com/hostel/
+  config/        Security configuration
+  controller/    REST controllers + global error handler
+  service/       Business rules (fees, rooms, payments)
+  repository/    Spring Data JPA repositories
+  entity/        Student, Room, PaymentRecord, SystemSetting
+  dto/           Request/response records
+  exception/     Custom exceptions
+src/main/resources/
+  application.properties
+  static/        index.html, app.js, error pages
+docs/            System.md, Security.md, Frontend.md
+```
+
+## API Overview
+
+All endpoints need a logged-in admin session.
+
+| Area      | Endpoints                                                                                               |
+| --------- | ------------------------------------------------------------------------------------------------------- |
+| Residents | `GET/POST /api/students`, `GET/PUT/DELETE /api/students/{id}`, `GET /api/students/reports/pending-fees` |
+| Payments  | `POST /api/payments`, `GET /api/payments/student/{id}`                                                  |
+| Rooms     | `GET /api/rooms`, `GET /api/rooms/{roomNumber}`                                                         |
+| Settings  | `GET/PUT /api/settings/standard-monthly-fee`                                                            |
+
+Full details are in [docs/System.md](docs/System.md).
+
+## Documentation
+
+- [System specification](docs/System.md)
+- [Security specification](docs/Security.md)
+- [Frontend specification](docs/Frontend.md)
+
+## Database and H2 Console
+
+Data is stored in `./data/hosteldb` (created on first run, not committed). The H2 console is at `/h2-console` (admin login required). Use JDBC URL `jdbc:h2:file:./data/hosteldb;AUTO_SERVER=TRUE`, user `sa`, empty password.
+
+To reset all data, stop the app and delete the `data/` folder.
+
+## Troubleshooting
+
+| Problem                                                 | Fix                                                                                                 |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `Could not resolve placeholder 'HOSTEL_ADMIN_USERNAME'` | `.env` is missing or misnamed. It must be exactly `.env` (not `.env.txt`) and sit beside `pom.xml`. |
+| Errors after pulling schema changes                     | Stop the app, delete `data/`, start again.                                                          |
+| Page looks unstyled                                     | Tailwind and FontAwesome load from a CDN, so check your internet connection.                        |
+| 403 when saving                                         | Refresh the page (stale security token).                                                            |
+
+## Security Notes
+
+- Never commit `.env` or `data/`.
+- This setup is for local or internal use. Before putting it on the internet, follow the production checklist in [docs/Security.md](docs/Security.md).

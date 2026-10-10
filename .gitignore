@@ -1,48 +1,45 @@
-# =========================================================================
-# 🏗️ Java Spring Boot & Maven Build Artifacts
-# =========================================================================
-/target/
-*.class
-
-# Remove the negative patterns from the old file to avoid Git confusion
-!/pom.xml
-
-# =========================================================================
-# 💾 Embedded H2 Database File Storage (Crucial!)
-# =========================================================================
-# Wipes local test database states from being committed to GitHub
-/data/
-
-# =========================================================================
-# 🛡️ Local Environment Security Secrets
-# =========================================================================
+# ---------- Secrets & local data (NEVER commit) ----------
 .env
-.env.local
+.env.*
+!.env.example
+data/
+*.mv.db
+*.trace.db
+*.lock.db
 
-# =========================================================================
-# 💻 IDE Settings & Local Code Execution Cache
-# =========================================================================
+# ---------- Build output ----------
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+build/
+*.class
+*.log
+
+# ---------- Generated / scratch files ----------
+HELP.md
+hostel-management-code.md
+
+# ---------- IDE & editor ----------
 .vscode/
-*.code-workspace
-
-# Spring Tool Suite / Eclipse runtime configurations
+.idea/
+*.iml
+*.iws
+*.ipr
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
-# =========================================================================
-# 🔧 Local Build System Execution Wrappers
-# =========================================================================
-.mvn/
-mvnw
-mvnw.cmd
-
-# =========================================================================
-# ⚙️ OS Garbage Files
-# =========================================================================
+# ---------- OS junk ----------
 .DS_Store
 Thumbs.db
+desktop.ini
