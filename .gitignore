@@ -1,27 +1,31 @@
 # =========================================================================
-# 🏗️ Build Artifacts & Compiled Code
+# 🏗️ Java Spring Boot & Maven Build Artifacts
 # =========================================================================
 /target/
 *.class
 
-# Remove the confusing negative patterns to keep target exclusion solid
+# Remove the negative patterns from the old file to avoid Git confusion
 !/pom.xml
 
 # =========================================================================
-# 🛡️ Secrets, Configurations & Local Storage
+# 💾 Embedded H2 Database File Storage (Crucial!)
 # =========================================================================
-.env
-.env.local
+# Wipes local test database states from being committed to GitHub
 /data/
 
 # =========================================================================
-# 💻 IDE Specific Configurations & Metadata
+# 🛡️ Local Environment Security Secrets
 # =========================================================================
-# Visual Studio Code configurations
+.env
+.env.local
+
+# =========================================================================
+# 💻 IDE Settings & Local Code Execution Cache
+# =========================================================================
 .vscode/
 *.code-workspace
 
-# Spring Tool Suite (STS) & Eclipse Cache Files
+# Spring Tool Suite / Eclipse runtime configurations
 .apt_generated
 .classpath
 .factorypath
@@ -31,14 +35,14 @@
 .sts4-cache
 
 # =========================================================================
-# 🔧 Build System Wrapper Configurations
+# 🔧 Local Build System Execution Wrappers
 # =========================================================================
 .mvn/
 mvnw
 mvnw.cmd
 
 # =========================================================================
-# ⚙️ Operating System Caches (System Waste)
+# ⚙️ OS Garbage Files
 # =========================================================================
 .DS_Store
 Thumbs.db
