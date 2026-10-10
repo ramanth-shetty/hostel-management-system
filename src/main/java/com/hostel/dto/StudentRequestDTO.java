@@ -4,50 +4,34 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-public class StudentRequestDTO {
+/**
+ * Body for POST /api/students and PUT /api/students/{id}.
+ * Fees are NOT editable here. initialPayment/paymentMode are only used on create
+ * (they become a PaymentRecord); later payments go through POST /api/payments.
+ */
+public record StudentRequestDTO(
 
-    @NotBlank(message = "Name is required")
-    private String name;
+        @NotBlank(message = "Name is required")
+        @Size(max = 100, message = "Name must be at most 100 characters")
+        String name,
 
-    @NotBlank(message = "Room number is required")
-    private String roomNumber;
+        @NotBlank(message = "Room number is required")
+        @Pattern(regexp = "^[A-Z]-[1-9][0-9]{2}$", message = "Room number must match the format A-101")
+        String roomNumber,
 
-    @NotNull(message = "Admission date is required")
-    private LocalDate admissionDate;
+        @NotNull(message = "Admission date is required")
+        LocalDate admissionDate,
 
-    @NotNull
-    @DecimalMin("0.00")
-    private BigDecimal feesPaid;
+        @DecimalMin(value = "0.00", message = "Initial payment cannot be negative")
+        @Digits(integer = 10, fraction = 2, message = "Use at most 2 decimal places")
+        BigDecimal initialPayment,
 
-    @NotNull
-    @DecimalMin("0.00")
-    private BigDecimal pendingFees;
-
-    public StudentRequestDTO() {}
-
-    public StudentRequestDTO(String name, String roomNumber, LocalDate admissionDate, BigDecimal feesPaid, BigDecimal pendingFees) {
-        this.name = name;
-        this.roomNumber = roomNumber;
-        this.admissionDate = admissionDate;
-        this.feesPaid = feesPaid;
-        this.pendingFees = pendingFees;
-    }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getRoomNumber() { return roomNumber; }
-    public void setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
-
-    public LocalDate getAdmissionDate() { return admissionDate; }
-    public void setAdmissionDate(LocalDate admissionDate) { this.admissionDate = admissionDate; }
-
-    public BigDecimal getFeesPaid() { return feesPaid; }
-    public void setFeesPaid(BigDecimal feesPaid) { this.feesPaid = feesPaid; }
-
-    public BigDecimal getPendingFees() { return pendingFees; }
-    public void setPendingFees(BigDecimal pendingFees) { this.pendingFees = pendingFees; }
+        @Pattern(regexp = "^(CASH|UPI|CARD|BANK_TRANSFER)$", message = "Payment mode must be CASH, UPI, CARD or BANK_TRANSFER")
+        String paymentMode) {
 }

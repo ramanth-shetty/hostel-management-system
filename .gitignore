@@ -1,10 +1,27 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# =========================================================================
+# 🏗️ Build Artifacts & Compiled Code
+# =========================================================================
+/target/
+*.class
 
-### STS ###
+# Remove the confusing negative patterns to keep target exclusion solid
+!/pom.xml
+
+# =========================================================================
+# 🛡️ Secrets, Configurations & Local Storage
+# =========================================================================
+.env
+.env.local
+/data/
+
+# =========================================================================
+# 💻 IDE Specific Configurations & Metadata
+# =========================================================================
+# Visual Studio Code configurations
+.vscode/
+*.code-workspace
+
+# Spring Tool Suite (STS) & Eclipse Cache Files
 .apt_generated
 .classpath
 .factorypath
@@ -13,21 +30,15 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# =========================================================================
+# 🔧 Build System Wrapper Configurations
+# =========================================================================
+.mvn/
+mvnw
+mvnw.cmd
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
+# =========================================================================
+# ⚙️ Operating System Caches (System Waste)
+# =========================================================================
+.DS_Store
+Thumbs.db
